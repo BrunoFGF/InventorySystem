@@ -1,0 +1,61 @@
+====================
+# .NET
+====================
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+
+# Output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## User-specific files
+appsettings.Development.json
+
+# NuGet
+**/packages/*
+*.nupkg
+**/[Pp]ackages/*
+.nuget/
+
+## Rider
+.idea/
+
+## OS files
+Thumbs.db
+.DS_Store
+
+====================
+# Angular
+====================
+
+node_modules/
+dist/
+.tmp/
+out-tsc/
+.angular/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Misc
+coverage/
