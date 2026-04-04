@@ -25,6 +25,8 @@ namespace IS.Infrastructure.Configuration
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasIndex(ps => new { ps.ProductId, ps.SupplierId, ps.BatchNumber }).IsUnique();
+
+            builder.HasQueryFilter(ps => !ps.Product.IsDeleted);
         }
     }
 }
