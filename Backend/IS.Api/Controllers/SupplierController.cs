@@ -9,6 +9,7 @@ namespace IS.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
+    [Produces("application/json")]
     public class SupplierController : ControllerBase
     {
         private readonly ISupplierService _supplierService;
@@ -19,6 +20,8 @@ namespace IS.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<SupplierDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<ApiResponse<IEnumerable<SupplierDto>>>> GetAll()
         {
             var suppliers = await _supplierService.GetAllAsync();
@@ -26,6 +29,9 @@ namespace IS.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<SupplierDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<ApiResponse<SupplierDto>>> GetById(int id)
         {
             var supplier = await _supplierService.GetByIdAsync(id);
