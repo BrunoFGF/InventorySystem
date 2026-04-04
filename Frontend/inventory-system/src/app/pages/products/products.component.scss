@@ -60,10 +60,17 @@
 
 .table-card {
   padding: 0;
-  overflow: hidden;
 }
 
-.full-width { width: 100%; }
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.full-width {
+  width: 100%;
+  min-width: 480px;
+}
 
 .product-name {
   font-weight: 500;
@@ -103,12 +110,6 @@ tr.mat-mdc-row:hover {
   background-color: #f9f9f9;
 }
 
-// Tablet: ocultar columna fecha
-@media (max-width: 959px) {
-  .mat-column-createdAt { display: none; }
-}
-
-// Mobile: ocultar suppliers y stock, dejar solo nombre + acciones
 @media (max-width: 599px) {
   .container {
     margin: 1rem auto;
@@ -124,7 +125,4 @@ tr.mat-mdc-row:hover {
 
     button { width: 100%; }
   }
-
-  .mat-column-suppliers,
-  .mat-column-stock { display: none; }
 }
