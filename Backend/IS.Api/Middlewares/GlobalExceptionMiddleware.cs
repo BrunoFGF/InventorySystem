@@ -37,7 +37,13 @@ namespace IS.Api.Middlewares
                 _ => (HttpStatusCode.InternalServerError, ErrorMessages.UnexpectedError)
             };
 
-            _logger.LogError(exception, "Error: {Message}", exception.Message);
+            _logger.LogError(
+                exception,
+                "{Method} {Path} responded {StatusCode} - {Message}",
+                context.Request.Method,
+                context.Request.Path,
+                (int)statusCode,
+                exception.Message);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;

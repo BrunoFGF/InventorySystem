@@ -52,7 +52,9 @@ export class ProductsComponent implements OnInit {
     this.loading = true;
     this.productService.getAll().subscribe({
       next: (response) => {
-        this.products = response.data;
+        if (response.success) {
+          this.products = response.data;
+        }
         this.loading = false;
         this.cdr.markForCheck();
       },
