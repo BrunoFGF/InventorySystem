@@ -48,7 +48,7 @@ IS.Shared        → Wrapper ApiResponse<T>, constantes, mensajes de error
 
 Se realizó un análisis de la problemática y se diagramó un **Modelo Entidad-Relación (MER)** como punto de partida:
 
-![MER preview](images/Diagrama MER.jpg)
+![MER](<Frontend/inventory-system/images/Diagrama MER.jpg>)
 
 A partir del MER se definieron las entidades del dominio y sus relaciones:
 
