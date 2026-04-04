@@ -30,20 +30,32 @@ body {
 }
 
 // Snackbar personalizado
-.snackbar-success {
-  --mdc-snackbar-container-color: #2e7d32;
-  --mdc-snackbar-supporting-text-color: #fff;
-  --mat-snack-bar-button-color: #a5d6a7;
+.snackbar-success .mdc-snackbar__surface {
+  background-color: #2e7d32 !important;
+}
+.snackbar-success .mdc-snackbar__label {
+  color: #fff !important;
+}
+.snackbar-success .mat-mdc-button {
+  color: #a5d6a7 !important;
 }
 
-.snackbar-error {
-  --mdc-snackbar-container-color: #c62828;
-  --mdc-snackbar-supporting-text-color: #fff;
-  --mat-snack-bar-button-color: #ef9a9a;
+.snackbar-error .mdc-snackbar__surface {
+  background-color: #c62828 !important;
+}
+.snackbar-error .mdc-snackbar__label {
+  color: #fff !important;
+}
+.snackbar-error .mat-mdc-button {
+  color: #ef9a9a !important;
 }
 
-.snackbar-warning {
-  --mdc-snackbar-container-color: #e65100;
-  --mdc-snackbar-supporting-text-color: #fff;
-  --mat-snack-bar-button-color: #ffcc80;
+.snackbar-warning .mdc-snackbar__surface {
+  background-color: #e65100 !important;
+}
+.snackbar-warning .mdc-snackbar__label {
+  color: #fff !important;
+}
+.snackbar-warning .mat-mdc-button {
+  color: #ffcc80 !important;
 }
