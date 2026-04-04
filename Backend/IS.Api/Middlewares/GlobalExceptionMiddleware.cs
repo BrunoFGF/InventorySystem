@@ -1,6 +1,7 @@
 ﻿using IS.Domain.Exceptions;
 using IS.Shared.Constants;
 using IS.Shared.Wrappers;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace IS.Api.Middlewares
@@ -34,6 +35,7 @@ namespace IS.Api.Middlewares
             {
                 NotFoundException => (HttpStatusCode.NotFound, exception.Message),
                 BusinessException => (HttpStatusCode.BadRequest, exception.Message),
+                DbUpdateException => (HttpStatusCode.Conflict, ErrorMessages.DuplicateEntry),
                 _ => (HttpStatusCode.InternalServerError, ErrorMessages.UnexpectedError)
             };
 
