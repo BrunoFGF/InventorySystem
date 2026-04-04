@@ -105,4 +105,8 @@ export class ProductsComponent implements OnInit {
   getTotalStock(product: Product): number {
     return product.suppliers.reduce((total, s) => total + s.stock, 0);
   }
+
+  getTotalStockAll(): number {
+    return this.dataSource.data.reduce((total, p) => total + this.getTotalStock(p), 0);
+  }
 }
