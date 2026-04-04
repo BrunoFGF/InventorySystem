@@ -100,6 +100,7 @@ var app = builder.Build();
 
 // Middleware
 app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {

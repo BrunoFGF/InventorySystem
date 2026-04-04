@@ -4,16 +4,19 @@ using IS.Domain.Entities;
 using IS.Domain.Exceptions;
 using IS.Domain.Interfaces;
 using IS.Shared.Constants;
+using Microsoft.Extensions.Logging;
 
 namespace IS.Application.Services
 {
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IUnitOfWork unitOfWork)
+        public ProductService(IUnitOfWork unitOfWork, ILogger<ProductService> logger)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllByUserAsync(int userId)
@@ -48,6 +51,8 @@ namespace IS.Application.Services
 
             await _unitOfWork.Products.AddAsync(product);
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Product {ProductId} created by user {UserId}", product.Id, userId);
 
             var auditLogs = new List<AuditLog>
             {
@@ -93,6 +98,8 @@ namespace IS.Application.Services
 
             _unitOfWork.Products.Update(product);
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Product {ProductId} updated", id);
 
             return await GetByIdAsync(id);
         }
@@ -145,6 +152,8 @@ namespace IS.Application.Services
 
             _unitOfWork.Products.Update(product);
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Product {ProductId} deleted", id);
         }
 
         private static AuditLog CreateAuditLog(string table, int recordId, string field, string? oldValue, string? newValue, string action)
