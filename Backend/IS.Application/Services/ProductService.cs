@@ -49,6 +49,14 @@ namespace IS.Application.Services
             await _unitOfWork.Products.AddAsync(product);
             await _unitOfWork.SaveChangesAsync();
 
+            var auditLogs = new List<AuditLog>
+            {
+                CreateAuditLog(AppConstants.TableNames.Product, product.Id, AppConstants.FieldNames.Name, null, product.Name, AppConstants.AuditActions.Create),
+                CreateAuditLog(AppConstants.TableNames.Product, product.Id, AppConstants.FieldNames.Description, null, product.Description, AppConstants.AuditActions.Create)
+            };
+            await _unitOfWork.AuditLogs.AddRangeAsync(auditLogs);
+            await _unitOfWork.SaveChangesAsync();
+
             return await GetByIdAsync(product.Id);
         }
 
@@ -60,10 +68,12 @@ namespace IS.Application.Services
             var auditLogs = new List<AuditLog>();
 
             if (product.Name != dto.Name)
-                auditLogs.Add(CreateAuditLog(AppConstants.TableNames.Product, id, AppConstants.FieldNames.Name, product.Name, dto.Name));
+                auditLogs.Add(CreateAuditLog(AppConstants.TableNames.Product, id, AppConstants.FieldNames.Name, product.Name, dto.Name, AppConstants.AuditActions.Update));
 
             if (product.Description != dto.Description)
-                auditLogs.Add(CreateAuditLog(AppConstants.TableNames.Product, id, AppConstants.FieldNames.Description, product.Description, dto.Description));
+                auditLogs.Add(CreateAuditLog(AppConstants.TableNames.Product, id, AppConstants.FieldNames.Description, product.Description, dto.Description, AppConstants.AuditActions.Update));
+
+            auditLogs.AddRange(BuildSupplierAuditLogs(id, product.ProductSuppliers, dto.Suppliers));
 
             product.Name = dto.Name;
             product.Description = dto.Description;
@@ -87,6 +97,41 @@ namespace IS.Application.Services
             return await GetByIdAsync(id);
         }
 
+        private static IEnumerable<AuditLog> BuildSupplierAuditLogs(int productId, IEnumerable<ProductSupplier> oldSuppliers, IEnumerable<CreateProductSupplierDto> newSuppliers)
+        {
+            var logs = new List<AuditLog>();
+            var tableName = $"{AppConstants.TableNames.ProductSupplier}/ProductId";
+
+            var oldMap = oldSuppliers.ToDictionary(s => s.BatchNumber);
+            var newMap = newSuppliers.ToDictionary(s => s.BatchNumber);
+
+            foreach (var (batch, oldPs) in oldMap)
+            {
+                if (!newMap.TryGetValue(batch, out var newPs))
+                {
+                    logs.Add(CreateAuditLog(tableName, productId, AppConstants.FieldNames.BatchNumber, batch, null, AppConstants.AuditActions.Delete));
+                    continue;
+                }
+
+                if (oldPs.SupplierId != newPs.SupplierId)
+                    logs.Add(CreateAuditLog(tableName, productId, AppConstants.FieldNames.SupplierId, oldPs.SupplierId.ToString(), newPs.SupplierId.ToString(), AppConstants.AuditActions.Update));
+
+                if (oldPs.Price != newPs.Price)
+                    logs.Add(CreateAuditLog(tableName, productId, AppConstants.FieldNames.Price, oldPs.Price.ToString(), newPs.Price.ToString(), AppConstants.AuditActions.Update));
+
+                if (oldPs.Stock != newPs.Stock)
+                    logs.Add(CreateAuditLog(tableName, productId, AppConstants.FieldNames.Stock, oldPs.Stock.ToString(), newPs.Stock.ToString(), AppConstants.AuditActions.Update));
+            }
+
+            foreach (var (batch, newPs) in newMap)
+            {
+                if (!oldMap.ContainsKey(batch))
+                    logs.Add(CreateAuditLog(tableName, productId, AppConstants.FieldNames.BatchNumber, null, batch, AppConstants.AuditActions.Create));
+            }
+
+            return logs;
+        }
+
         public async Task DeleteAsync(int id)
         {
             var product = await _unitOfWork.Products.GetByIdAsync(id)
@@ -95,14 +140,14 @@ namespace IS.Application.Services
             product.IsDeleted = true;
             product.DeletedAt = DateTime.Now;
 
-            var auditLog = CreateAuditLog(AppConstants.TableNames.Product, id, AppConstants.FieldNames.IsDeleted, "false", "true");
+            var auditLog = CreateAuditLog(AppConstants.TableNames.Product, id, AppConstants.FieldNames.IsDeleted, "false", "true", AppConstants.AuditActions.Delete);
             await _unitOfWork.AuditLogs.AddAsync(auditLog);
 
             _unitOfWork.Products.Update(product);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        private static AuditLog CreateAuditLog(string table, int recordId, string field, string? oldValue, string? newValue)
+        private static AuditLog CreateAuditLog(string table, int recordId, string field, string? oldValue, string? newValue, string action)
         {
             return new AuditLog
             {
@@ -111,7 +156,7 @@ namespace IS.Application.Services
                 FieldName = field,
                 OldValue = oldValue,
                 NewValue = newValue,
-                Action = AppConstants.AuditActions.Update
+                Action = action
             };
         }
 

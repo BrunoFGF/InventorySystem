@@ -21,6 +21,10 @@
             public const string Name = "Name";
             public const string Description = "Description";
             public const string IsDeleted = "IsDeleted";
+            public const string SupplierId = "SupplierId";
+            public const string Price = "Price";
+            public const string Stock = "Stock";
+            public const string BatchNumber = "BatchNumber";
         }
     }
 }
