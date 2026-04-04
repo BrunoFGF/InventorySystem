@@ -1,0 +1,68 @@
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.form-card {
+  padding: 2rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.suppliers-section {
+  margin-top: 1rem;
+}
+
+.suppliers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.supplier-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.supplier-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  .supplier-field {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+.no-suppliers {
+  text-align: center;
+  color: #999;
+  padding: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .supplier-row {
+    flex-direction: column;
+
+    .supplier-field {
+      width: 100%;
+    }
+  }
+}

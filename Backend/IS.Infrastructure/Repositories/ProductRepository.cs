@@ -27,5 +27,10 @@ namespace IS.Infrastructure.Repositories
                     .ThenInclude(ps => ps.Supplier)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public void RemoveProductSuppliers(IEnumerable<ProductSupplier> suppliers)
+        {
+            _context.RemoveRange(suppliers);
+        }
     }
 }

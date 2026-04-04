@@ -6,5 +6,6 @@ namespace IS.Domain.Interfaces
     {
         Task<IEnumerable<Product>> GetActiveProductsByUserAsync(int userId);
         Task<Product?> GetProductWithSuppliersAsync(int id);
+        void RemoveProductSuppliers(IEnumerable<ProductSupplier> suppliers);
     }
 }

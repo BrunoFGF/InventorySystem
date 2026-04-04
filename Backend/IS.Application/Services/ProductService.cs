@@ -69,7 +69,7 @@ namespace IS.Application.Services
             product.Description = dto.Description;
             product.UpdatedAt = DateTime.Now;
 
-            product.ProductSuppliers.Clear();
+            _unitOfWork.Products.RemoveProductSuppliers(product.ProductSuppliers.ToList());
             product.ProductSuppliers = dto.Suppliers.Select(s => new ProductSupplier
             {
                 SupplierId = s.SupplierId,
