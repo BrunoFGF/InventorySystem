@@ -25,10 +25,13 @@ namespace IS.Application.Services
             return products.Select(MapToDto);
         }
 
-        public async Task<ProductDto> GetByIdAsync(int id)
+        public async Task<ProductDto> GetByIdAsync(int id, int userId)
         {
             var product = await _unitOfWork.Products.GetProductWithSuppliersAsync(id)
                 ?? throw new NotFoundException(nameof(Product), id);
+
+            if (product.UserId != userId)
+                throw new NotFoundException(nameof(Product), id);
 
             return MapToDto(product);
         }
@@ -62,13 +65,16 @@ namespace IS.Application.Services
             await _unitOfWork.AuditLogs.AddRangeAsync(auditLogs);
             await _unitOfWork.SaveChangesAsync();
 
-            return await GetByIdAsync(product.Id);
+            return await GetByIdAsync(product.Id, userId);
         }
 
-        public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto)
+        public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto, int userId)
         {
             var product = await _unitOfWork.Products.GetProductWithSuppliersAsync(id)
                 ?? throw new NotFoundException(nameof(Product), id);
+
+            if (product.UserId != userId)
+                throw new NotFoundException(nameof(Product), id);
 
             var auditLogs = new List<AuditLog>();
 
@@ -101,7 +107,7 @@ namespace IS.Application.Services
 
             _logger.LogInformation("Product {ProductId} updated", id);
 
-            return await GetByIdAsync(id);
+            return await GetByIdAsync(id, userId);
         }
 
         private static IEnumerable<AuditLog> BuildSupplierAuditLogs(int productId, IEnumerable<ProductSupplier> oldSuppliers, IEnumerable<CreateProductSupplierDto> newSuppliers)
@@ -139,10 +145,13 @@ namespace IS.Application.Services
             return logs;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, int userId)
         {
             var product = await _unitOfWork.Products.GetByIdAsync(id)
                 ?? throw new NotFoundException(nameof(Product), id);
+
+            if (product.UserId != userId)
+                throw new NotFoundException(nameof(Product), id);
 
             product.IsDeleted = true;
             product.DeletedAt = DateTime.Now;

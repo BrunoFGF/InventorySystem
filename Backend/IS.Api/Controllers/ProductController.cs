@@ -37,7 +37,7 @@ namespace IS.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<ApiResponse<ProductDto>>> GetById(int id)
         {
-            var product = await _productService.GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id, GetUserId());
             return Ok(ApiResponse<ProductDto>.Ok(product));
         }
 
@@ -58,7 +58,7 @@ namespace IS.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<ApiResponse<ProductDto>>> Update(int id, [FromBody] UpdateProductDto dto)
         {
-            var product = await _productService.UpdateAsync(id, dto);
+            var product = await _productService.UpdateAsync(id, dto, GetUserId());
             return Ok(ApiResponse<ProductDto>.Ok(product, "Producto actualizado exitosamente."));
         }
 
@@ -68,7 +68,7 @@ namespace IS.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<ApiResponse<object>>> Delete(int id)
         {
-            await _productService.DeleteAsync(id);
+            await _productService.DeleteAsync(id, GetUserId());
             return Ok(ApiResponse<object>.Ok(null!, "Producto eliminado exitosamente."));
         }
     }
