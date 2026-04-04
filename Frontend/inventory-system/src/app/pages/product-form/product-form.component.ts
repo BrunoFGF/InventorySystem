@@ -8,11 +8,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProductService } from '../../services/product.service';
 import { SupplierService } from '../../services/supplier.service';
+import { NotificationService } from '../../services/notification.service';
 import { CreateProduct, CreateProductSupplier } from '../../interfaces/product';
 import { Supplier } from '../../interfaces/supplier';
 
@@ -53,7 +54,7 @@ export class ProductFormComponent implements OnInit {
     private router: Router,
     private productService: ProductService,
     private supplierService: SupplierService,
-    private snackBar: MatSnackBar,
+    private notification: NotificationService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -97,7 +98,7 @@ export class ProductFormComponent implements OnInit {
         }
       },
       error: () => {
-        this.snackBar.open('Error al cargar el producto.', 'Cerrar', { duration: 3000 });
+        this.notification.error('Error al cargar el producto.');
         this.router.navigate(['/products']);
       }
     });
@@ -118,12 +119,12 @@ export class ProductFormComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.product.name) {
-      this.snackBar.open('El nombre es obligatorio.', 'Cerrar', { duration: 3000 });
+      this.notification.warning('El nombre es obligatorio.');
       return;
     }
 
     if (this.product.suppliers.length === 0) {
-      this.snackBar.open('Agregue al menos un proveedor.', 'Cerrar', { duration: 3000 });
+      this.notification.warning('Agregue al menos un proveedor.');
       return;
     }
 
@@ -136,11 +137,7 @@ export class ProductFormComponent implements OnInit {
     request.subscribe({
       next: (response) => {
         if (response.success) {
-          this.snackBar.open(
-            this.isEdit ? 'Producto actualizado.' : 'Producto creado.',
-            'Cerrar',
-            { duration: 3000 }
-          );
+          this.notification.success(this.isEdit ? 'Producto actualizado.' : 'Producto creado.');
           this.router.navigate(['/products']);
         } else {
           this.loading.set(false);
@@ -149,7 +146,7 @@ export class ProductFormComponent implements OnInit {
       error: (err) => {
         this.loading.set(false);
         const message = err.error?.message || 'Error al guardar el producto.';
-        this.snackBar.open(message, 'Cerrar', { duration: 3000 });
+        this.notification.error(message);
       }
     });
   }

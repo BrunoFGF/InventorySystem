@@ -8,10 +8,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProductService } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 import { Product } from '../../interfaces/product';
 
 @Component({
@@ -28,6 +31,7 @@ import { Product } from '../../interfaces/product';
     MatCardModule,
     MatSnackBarModule,
     MatTooltipModule,
+    MatDialogModule,
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'
@@ -45,7 +49,8 @@ export class ProductsComponent implements OnInit {
     private productService: ProductService,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private notification: NotificationService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -64,7 +69,7 @@ export class ProductsComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => {
-        this.snackBar.open('Error al cargar los productos.', 'Cerrar', { duration: 3000 });
+        this.notification.error('Error al cargar los productos.');
         this.loading = false;
         this.cdr.markForCheck();
       }
@@ -80,20 +85,32 @@ export class ProductsComponent implements OnInit {
   }
 
   deleteProduct(product: Product): void {
-    if (!confirm(`¿Está seguro de eliminar "${product.name}"?`)) return;
-
-    this.productService.delete(product.id).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.snackBar.open('Producto eliminado exitosamente.', 'Cerrar', { duration: 3000 });
-          this.loadProducts();
-        }
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.snackBar.open('Error al eliminar el producto.', 'Cerrar', { duration: 3000 });
-        this.cdr.markForCheck();
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Eliminar producto',
+        message: `¿Está seguro de eliminar "${product.name}"? Esta acción no se puede deshacer.`,
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar'
       }
+    });
+
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.productService.delete(product.id).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.notification.success('Producto eliminado exitosamente.');
+            this.loadProducts();
+          }
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.notification.error('Error al eliminar el producto.');
+          this.cdr.markForCheck();
+        }
+      });
     });
   }
 
