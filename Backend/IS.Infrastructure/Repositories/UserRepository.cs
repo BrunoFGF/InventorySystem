@@ -11,7 +11,7 @@ namespace IS.Infrastructure.Repositories
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }
