@@ -1,15 +1,15 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
 import { ProductService } from '../../services/product.service';
 import { AuthService } from '../../services/auth.service';
 import { Product } from '../../interfaces/product';
@@ -20,21 +20,26 @@ import { Product } from '../../interfaces/product';
   imports: [
     CommonModule,
     MatTableModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
     MatCardModule,
     MatSnackBarModule,
-    MatDialogModule,
     MatTooltipModule,
-    MatChipsModule
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'
 })
 export class ProductsComponent implements OnInit {
-  products: Product[] = [];
+  displayedColumns = ['name', 'suppliers', 'stock', 'createdAt', 'actions'];
+  dataSource = new MatTableDataSource<Product>([]);
   loading = true;
+
+  @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
+    if (paginator) this.dataSource.paginator = paginator;
+  }
 
   constructor(
     private productService: ProductService,
@@ -53,13 +58,12 @@ export class ProductsComponent implements OnInit {
     this.productService.getAll().subscribe({
       next: (response) => {
         if (response.success) {
-          this.products = response.data;
+          this.dataSource.data = response.data;
         }
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: (err) => {
-        console.error('Error:', err);
+      error: () => {
         this.snackBar.open('Error al cargar los productos.', 'Cerrar', { duration: 3000 });
         this.loading = false;
         this.cdr.markForCheck();
